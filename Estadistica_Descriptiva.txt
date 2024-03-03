@@ -1,0 +1,381 @@
+####################################################################################################
+#######                     ESTADISTICA DESCRIPTIVA
+
+####################################################################################################
+
+
+
+Notas<-c()
+
+Notas<-c(15, 45, 47,53, 58, 58, 60, 62, 67, 74, 75, 78, 80, 80, 81, 85, 85, 85, 90, 92)
+Notas
+
+# Resumen de los cinco números
+
+?fivenum
+
+
+fivenum(Notas)
+
+# Resumen de los cinco números más la media
+
+summary(Notas)
+
+#Rango
+range(Notas)
+range(Notas)
+range
+#Rango obtenido paso a paso
+
+Rango<-max(Notas)-min(Notas)
+Rango
+
+Rango<-max(Notas)-min(Notas);Rango
+Rango
+
+#Media aritmética
+Media1<-mean(Notas)
+Media1
+Media<-mean(Notas)
+Media
+#Mediana
+
+Mediana<-median(Notas)  
+Mediana
+#Desviación estándar
+
+Desv_est<-sd(Notas)
+Desv_est
+#Varianza
+
+Varianza<-var(Notas)
+Varianza
+
+#Coeficiente de variación
+
+CV<-(Desv_est/Media)*100
+CV
+
+#Tamaño de la muestra
+
+n<-length(Notas)
+n
+
+
+#Error estándar de la media
+
+EE<-Desv_est/sqrt(n)
+EE
+
+#Objeto que contiene las estadísticas de resumen
+
+
+Descriptiva<-data.frame(Media,Mediana,Desv_est,Varianza,CV,n,EE)
+Descriptiva
+#Para visualizar el objeto, ejecute
+
+print(Descriptiva)
+
+
+# Percentiles
+quantile (Notas)
+quantile(Notas, c(0.025,0.90,0.975))
+IQR(Notas) #Rango Intercuartílico = Q3-Q1
+
+
+
+# Asimetría y curtosis
+
+install.packages('moments')
+ library(moments)
+
+skewness(Notas)
+kurtosis(Notas)
+
+
+
+#Diagrama de tallos y hojas
+
+?stem
+stem(Notas)
+stem(Notas, scale = 1, width = 80, atom = 1e-08)
+pie(Notas)
+ggplot(Notas,aes(x="",y=porcentaje, fill=categorias))+
+  geom_bar(stat = "identity",color="white")+
+  coord_polar(theta="y")
+
+#######################################################################################
+
+
+#                        Análisis exploratorio de datos con R
+
+#https://rpubs.com/camilamila/analisis_exp
+
+#######################################################################################
+
+
+options(scipen = 999) #Permita que el usuario establezca y examine una variedad
+#de opciones globales que afectan la forma en que R calcula y muestra sus resultados.
+
+install.packages("dplyr")# si no ha instalado estos paquetes debe correr primero el comando:
+library(dplyr)
+install.packages("ggplot2")
+library(ggplot2)
+install.packages("readxl")
+library(readxl)
+install.packages("gmodels")
+library(gmodels)
+install.packages("Hmisc")
+library(Hmisc)
+install.packages("ggthemes")
+library(ggthemes)
+
+
+
+
+
+# si no ha instalado estos paquetes debe correr primero el comando:
+library(dplyr)
+library(ggplot2)
+library(readxl)
+library(gmodels)
+library(Hmisc)
+library(ggthemes)
+
+
+#Importar archivos
+
+attach(encuesta) #Esto significa que R busca en la base de datos al evaluar una variable,
+#por lo que se puede acceder a los objetos de la base de datos simplemente dando sus nombres.
+
+
+glimpse(encuesta)
+
+
+
+table(encuesta$REGION)
+#Variables categóricas
+
+#Frecuencias simples
+
+table(encuesta$ZONA)
+
+
+#Y podemos ver que 447 personas viven en Zona Rural y 1008 en Urbana.
+
+#Tablas de contingencia
+table(encuesta$Tipo_vivienda, encuesta$ZONA)
+
+addmargins(table(encuesta$Tipo_vivienda, encuesta$ZONA))
+addmargins(table(encuesta$Tipo_vivienda, encuesta$ZONA))
+
+
+# Proporciones
+
+prop.table(table(encuesta$Tipo_vivienda, encuesta$ZONA))
+
+
+#En este caso nos muestra los datos como proporciones totales,
+#pero ¿cómo hacemos si queremos ver porcentajes por fila o columna?.
+
+#Esto lo hacemos poniendo una coma y luego 1 (filas) o 2 (columnas).
+#Filas
+prop.table(table(encuesta$Tipo_vivienda, encuesta$ZONA),1)
+
+#Columnas
+prop.table(table(encuesta$Tipo_vivienda, encuesta$ZONA),2)
+
+#CrossTable()
+
+#Un comando muy útil para simplificar los pasos es el comando CrossTable()
+#del paquete gmodels(). El comando nos permite presentar en una misma tabla
+#los porcentajes por fila o columna y el total de la tabla.
+
+CrossTable(encuesta$Tipo_vivienda, encuesta$ZONA)
+
+CrossTable(encuesta$Tipo_vivienda, encuesta$ZONA, prop.t=F, prop.chisq = F)
+
+CrossTable(encuesta$ZONA)
+
+
+# Datos numéricos
+summary(encuesta)
+
+describe(encuesta)
+
+hist(encuesta$ingreso)
+
+hist(encuesta$ingreso)
+mean(encuesta$ingreso)
+library("ggplot2")
+histograma<-ggplot(encuesta,aes(x=Mensualidad)) +
+  ggtitle("Mensualidad neto de hogares unipersonales")+
+  theme_fivethirtyeight()+ geom_histogram(color="#28324a", fill="#3c78d8")
+histograma
+
+histograma <- ggplot(encuesta, aes(x=ingreso)) +
+  ggtitle("Ingreso neto de hogares unipersonales") +
+  theme_fivethirtyeight() +
+  geom_histogram(color="#28324a", fill="#3c78d8")
+histograma
+
+# Group_by
+encuesta <- encuesta %>%
+  group_by(REGION) %>%
+  mutate(ingresoprom=mean(ingreso))
+encuesta %>%
+  group_by(REGION) %>%
+  summarise(ingresoprom=mean(ingreso),
+            edadprom=mean(Edad))
+
+
+ggplot(data = encuesta, aes(x = Edad, y = Escolari)) +
+  geom_point() +
+  xlab('Puntuación Audiencia') +
+  ylab('Puntuación de la Crítica') +
+  ggtitle('Relación entre Edad e Ingreso') +
+  theme_minimal()
+
+
+
+
+
+####################################################################################################
+####################################################################################################
+####################################################################################################
+####################################################################################################
+
+
+#           https://rpubs.com/rdelgado/429190
+
+
+####################################################################################################
+#######                     GRAFICOS ADICIONALES CON ggplot2
+
+####################################################################################################
+
+
+
+install.packages("ggcorrplot")
+library(ggcorrplot)
+
+# Gráficos de Barras (Barplot)
+head(mtcars)
+
+
+ggplot(data = mtcars, aes(x = gear)) + geom_bar()
+#el total de autos en el dataset agrupados por la cantidad de "cambios o velocidades" (columna 'gear')
+
+ggplot(data = mtcars, aes(x = gear)) +
+  geom_bar() +
+  xlab("Número de Velocidades") +
+  ylab("Cantidades") +
+  ggtitle("Gráfico de Barras")
+
+ggplot(data = mtcars, aes(x = gear)) +
+  geom_bar(color = 'darkslategray', fill = 'steelblue') +
+  xlab("Número de Velocidades") +
+  ylab("Cantidades") +
+  ggtitle("Gráfico de Barras")
+
+ggplot(data = mtcars, aes(x = gear)) +
+  geom_bar(color = 'darkslategray', fill = 'steelblue') +
+  xlab("Número de Velocidades") +
+  ylab("Cantidades") +
+  ggtitle("Gráfico de Barras") +
+  coord_flip()
+
+
+ggplot(data = mtcars, aes(x = gear, fill = as.factor(gear))) +
+  geom_bar() +
+  xlab("Número de Velocidades") +
+  ylab("Cantidades") +
+  ggtitle("Gráfico de Barras") +
+  labs(fill = "Velocidades")
+
+
+ggplot(data = mtcars, aes(x = gear, fill = as.factor(gear))) +
+  geom_bar() +
+  xlab("Número de Velocidades") +
+  ylab("Cantidades") +
+  ggtitle("Gráfico de Barras") +
+  labs(fill = "Velocidades") +
+  theme_minimal()
+
+#Histograma (Histogram) y Gráfico de Densidad (Density Plot)
+
+head(diamonds)
+ggplot(diamonds) +
+  geom_histogram(binwidth = 0.1, aes(x = carat), fill = 'steelblue') +
+  xlab("Carat") +
+  ylab("Frecuencia") +
+  ggtitle("Distribución de la variable Carat") +
+  theme_minimal()
+
+ggplot(diamonds) +
+  geom_histogram(bins = 50, aes(x = carat, fill = cut)) +
+  xlab("Carat") +
+  ylab("Frecuencia") +
+  ggtitle("Distribución de la variable Carat") +
+  theme_minimal()
+
+
+ggplot(diamonds) +
+  geom_histogram(bins = 50, aes(x = carat, fill = cut), color = 'black') +
+  facet_grid(cut~., scales = 'free') +
+  xlab("Carat") +
+  ylab("Frecuencia") +
+  ggtitle("Distribución de la variable Carat para los distintos Cut") +
+  theme_minimal()
+
+
+# DENSIDAD KERNEL
+
+ggplot(diamonds) +
+  geom_density(aes(x = carat), fill = 'steelblue') +
+  xlab("Carat") +
+  ylab("Frecuencia") +
+  ggtitle("Distribución de la variable Carat (Densidad KERNEL)") +
+  theme_minimal()
+
+ggplot(diamonds) +
+  geom_density(aes(x = carat, fill = clarity), position = 'stack') +
+  facet_grid(clarity~., scales = 'free') +
+  xlab("Carat") +
+  ylab("Frecuencia") +
+  ggtitle("Distribución de la variable Carat (Densidad) según variable Clarity") +
+  theme_minimal()
+
+library(ggplot2)
+
+df<-data.frame(categorias=c("cat1","cat2","cat3","cat4"),
+               porcentaje=c(25,20,15,40))
+
+
+ggplot(df,aes(x="",y=porcentaje, fill=categorias))+
+  geom_bar(stat = "identity",color="white")+
+  coord_polar(theta="y")
+
+ggplot(df,aes(x="",y=porcentaje, fill=categorias))+
+  geom_bar(stat = "identity",
+           color="white")+
+  geom_text(aes(label=porcentaje/100),
+            position=position_stack(vjust=0.5),color="white",size=6)+
+  coord_polar(theta = "y")+
+  scale_fill_manual(values=c("salmon","steelblue","orange","gray"))+
+  theme_void()+
+  labs(title="Gráfico de Pie")
+
+
+ggplot(df,aes(x=2,y=porcentaje, fill=categorias))+
+  geom_bar(stat = "identity",
+           color="white")+
+  geom_text(aes(label=porcentaje/100),
+            position=position_stack(vjust=0.5),color="white",size=6)+
+  coord_polar(theta = "y")+
+  scale_fill_manual(values=c("salmon","steelblue","orange","gray"))+
+  theme_void()+
+  labs(title="Gráfico de Dona")+
+  xlim(0.5,2.5)
+ 
+head(movies)
